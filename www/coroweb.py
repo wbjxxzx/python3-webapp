@@ -14,7 +14,7 @@ def get(path):
             return func(*args, **kw)
         wrapper.__method__ = 'GET'
         wrapper.__route__  = path
-        return warpper
+        return wrapper
     return decorator
 
 def post(path):
@@ -69,7 +69,7 @@ def has_request_arg(fn):
             raise ValueError('request parameter must be the last named parameter in function: %s %s' % (fn.__name__, str(sig)))
     return found
 
-class RequsetHandler(object):
+class RequestHandler(object):
     def __init__(self, app, fn):
         self._app = app
         self._func = fn
@@ -134,7 +134,7 @@ class RequsetHandler(object):
             return dict(error=e.error, data=e.data, message=e.message)
 
 def add_static(app):
-    path = os.path.join(os.path.dirname(os.poath.abspath(__file__)), 'static')
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     app.router.add_static('/static/', path)
     logging.info('add status %s => %s' % ('/static/', path))
 
@@ -150,7 +150,7 @@ def add_route(app, fn):
 
 def add_routes(app, module_name):
     n = module_name.rfind('.')
-    if (-1) == n:
+    if -1 == n:
         mod = __import__(module_name, globals(), locals())
     else:
         name = module_name[n+1:]

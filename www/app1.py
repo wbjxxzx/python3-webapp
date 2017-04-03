@@ -1,13 +1,20 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
-__author__ = 'dcje'
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-import logging; logging.basicConfig(filename="webapp.log",filemode="a",format="%(asctime)s-%(name)s-%(levelname)s-%(message)s",level=logging.INFO)
+__author__ = 'Michael Liao'
+
+'''
+async web application.
+'''
+
+import logging; logging.basicConfig(level=logging.INFO)
+
 import asyncio, os, json, time
 from datetime import datetime
+
 from aiohttp import web
 from jinja2 import Environment, FileSystemLoader
-from config import configs
+
 import orm
 from coroweb import add_routes, add_static
 
@@ -32,34 +39,29 @@ def init_jinja2(app, **kw):
             env.filters[name] = f
     app['__templating__'] = env
 
-@asyncio.coroutine
-def logger_factory(app, handler):
-    #@asyncio.coroutine
-    def logger(request):
+async def logger_factory(app, handler):
+    async def logger(request):
         logging.info('Request: %s %s' % (request.method, request.path))
-        return(yield from handler(request))
+        # await asyncio.sleep(0.3)
+        return (await handler(request))
     return logger
 
-@asyncio.coroutine
-def data_factory(app, handler):
-    #@asyncio.coroutine
-    def parse_data(request):
-        if 'POST' == request.method:
+async def data_factory(app, handler):
+    async def parse_data(request):
+        if request.method == 'POST':
             if request.content_type.startswith('application/json'):
-                request.__data__ = yield from request.json()
+                request.__data__ = await request.json()
                 logging.info('request json: %s' % str(request.__data__))
             elif request.content_type.startswith('application/x-www-form-urlencoded'):
-                request.__data__ = yield from request.post()
+                request.__data__ = await request.post()
                 logging.info('request form: %s' % str(request.__data__))
-        return (yield from handler(request))
+        return (await handler(request))
     return parse_data
 
-@asyncio.coroutine
-def response_factory(app, handler):
-    #@asyncio.coroutine
-    def response(request):
-        logging.info('Response handlerl...')
-        r = yield from handler(request)
+async def response_factory(app, handler):
+    async def response(request):
+        logging.info('Response handler...')
+        r = await handler(request)
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -75,8 +77,7 @@ def response_factory(app, handler):
         if isinstance(r, dict):
             template = r.get('__template__')
             if template is None:
-                resp = web.Response(body=json.dumps(r, ensure_ascii=False,
-                    default=lambda o: o.__dict__).encode('utf-8'))
+                resp = web.Response(body=json.dumps(r, ensure_ascii=False, default=lambda o: o.__dict__).encode('utf-8'))
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
             else:
@@ -85,11 +86,11 @@ def response_factory(app, handler):
                 return resp
         if isinstance(r, int) and r >= 100 and r < 600:
             return web.Response(r)
-        if isinstance(r, tuple) and 2 == len(r):
+        if isinstance(r, tuple) and len(r) == 2:
             t, m = r
-            if isinstance(t, int) and t >=100 and t < 600:
+            if isinstance(t, int) and t >= 100 and t < 600:
                 return web.Response(t, str(m))
-
+        # default:
         resp = web.Response(body=str(r).encode('utf-8'))
         resp.content_type = 'text/plain;charset=utf-8'
         return resp
@@ -108,16 +109,15 @@ def datetime_filter(t):
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 
-@asyncio.coroutine
-def init(loop):
-    yield from orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='dcje', password='123', db='py_web')
+async def init(loop):
+    await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='dcje', password='123', db='py_web')
     app = web.Application(loop=loop, middlewares=[
         logger_factory, response_factory
     ])
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000)
+    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 9000)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
 
