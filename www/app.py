@@ -10,6 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 from config import configs
 import orm
 from coroweb import add_routes, add_static
+from handlers import cookie2user, COOKIE_NAME
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
@@ -34,15 +35,32 @@ def init_jinja2(app, **kw):
 
 @asyncio.coroutine
 def logger_factory(app, handler):
-    #@asyncio.coroutine
+    @asyncio.coroutine
     def logger(request):
         logging.info('Request: %s %s' % (request.method, request.path))
         return(yield from handler(request))
     return logger
 
 @asyncio.coroutine
+def auth_factory(app, handler):
+    @asyncio.coroutine
+    def auth(request):
+        logging.info('check user: %s %s' % (request.method, request.path))
+        request.__user__ = None
+        cookie_str = request.cookies.get(COOKIE_NAME)
+        if cookie_str:
+            user = yield from cookie2user(cookie_str)
+            if user:
+                logging.info('set current user: %s' % user.email)
+                request.__user__ = user
+        if request.path.startswith('/manage/') and (requset.__user__ is None or not request.__user__.admin):
+            return web.HTTPFound('/signin')
+        return (yield from handler(request))
+    return auth
+
+@asyncio.coroutine
 def data_factory(app, handler):
-    #@asyncio.coroutine
+    @asyncio.coroutine
     def parse_data(request):
         if 'POST' == request.method:
             if request.content_type.startswith('application/json'):
@@ -56,9 +74,9 @@ def data_factory(app, handler):
 
 @asyncio.coroutine
 def response_factory(app, handler):
-    #@asyncio.coroutine
+    @asyncio.coroutine
     def response(request):
-        logging.info('Response handlerl...')
+        logging.info('Response handler...')
         r = yield from handler(request)
         if isinstance(r, web.StreamResponse):
             return r
@@ -80,6 +98,7 @@ def response_factory(app, handler):
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
             else:
+                r['__user__'] = request.__user__
                 resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp
@@ -110,9 +129,9 @@ def datetime_filter(t):
 
 @asyncio.coroutine
 def init(loop):
-    yield from orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='dcje', password='123', db='py_web')
+    yield from orm.create_pool(loop=loop, **configs.db)
     app = web.Application(loop=loop, middlewares=[
-        logger_factory, response_factory
+        logger_factory, response_factory, auth_factory
     ])
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
