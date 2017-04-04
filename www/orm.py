@@ -15,7 +15,7 @@ __author__ = 'dcje'
     包括数据类型、列名、主键和默认值
 '''
 
-import asyncio, logging;logging.basicConfig(filename="webapp.log",filemode="a",format="%(asctime)s-%(name)s-%(levelname)s-%(message)s",level=logging.INFO)
+import asyncio, logging;logging.basicConfig(level=logging.INFO)
 # pip install aiomysql
 import aiomysql
 

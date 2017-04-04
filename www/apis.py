@@ -23,7 +23,7 @@ class APIResourceNotFoundError(APIError):
 class APIPermissionError(APIError):
     
     def __init__(self, message=''):
-        super(APIPermissionError, self).__init__('permission:forbidden', 'permmission', message)
+        super(APIPermissionError, self).__init__('permission:forbidden', 'permission', message)
         
 class Page(object):
     '''

@@ -33,7 +33,7 @@ def text2html(text):
         filter(lambda s: s.strip() != '', text.split('\n')))
     return ''.join(lines)
 
-@asyncio.coroutine
+#@asyncio.coroutine
 def user2cookie(user, max_age):
     # build cookie string by: id-expires-sha1
     expires = str(int(time.time() + max_age))
@@ -83,7 +83,7 @@ def index(request):
 
 @get('/')
 #@asyncio.coroutine
-def index(request, *, page='1'):
+def index(*, page='1'):
     page_index = get_page_index(page)
     num = yield from Blog.findNumber('count(id)')
     page = Page(num)
@@ -147,7 +147,7 @@ def authenticate(*, email, passwd):
         raise APIValueError('passwd', 'Invalid password.')
     #authenticate ok, set cookie
     r = web.Response()
-    r.set_cookie(COOKIE_NAME, user2cookie(user, 3600), max_age=3600, httponly=True)
+    r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
     user.passwd = '******'
     r.content_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
@@ -269,7 +269,7 @@ def api_register_user(*, email, name, passwd):
     yield from user.save()
     # make session cookie:
     r = web.Response()
-    r.set_cookie(COOKIE_NAME, user2cookie(user,3600), max_age=3600, httponly=True)
+    r.set_cookie(COOKIE_NAME, user2cookie(user,86400), max_age=86400, httponly=True)
     user.passwd = '******'
     r.content_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
