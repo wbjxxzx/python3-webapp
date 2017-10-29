@@ -20,7 +20,7 @@ async def create_pool(loop, **kw):
         loop = loop
     )
 
-async def log(sql, args=()):
+def log(sql, args=()):
     logging.info('SQL: {}'.format(sql))
 
 async def select(sql, args, size=None):
@@ -38,7 +38,7 @@ async def select(sql, args, size=None):
         logging.info('rows returned: {}'.format(len(rs)))
         return rs
 
-async def execute(sql, args):
+async def execute(sql, args, autocommit=True):
     log(sql)
     async with __pool.get() as conn:
         if not autocommit:
@@ -73,7 +73,7 @@ class Field(object):
     def __str__(self):
         return '<{}, {}:{}>'.format(self.__class__.__name__, self.column_type, self.name)
 
-class StringFiled(Field):
+class StringField(Field):
     def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
         super().__init__(name, ddl, primary_key, default)
 
@@ -128,8 +128,8 @@ class ModelMetaclass(type):
         attrs['__fields__'] = fields
         attrs['__select__'] = 'select `{}`, {} from `{}`'.format(primaryKey, 
             ','.join(escaped_fields), tableName)
-        attrs['__insert__'] = 'insert into `{}` (`{}`, {}) values ({})'.format(
-            tableName, primaryKey, ','.join(escaped_fields), create_args_string(len(escaped_fields) + 1)
+        attrs['__insert__'] = 'insert into `{}` ({}, `{}`) values ({})'.format(
+            tableName, ','.join(escaped_fields), primaryKey, create_args_string(len(escaped_fields) + 1)
         )
         attrs['__update__'] = 'update `{}` set {} where `{}`=?'.format(
             tableName, ','.join(map(lambda k:'`{}`=?'.format(mappings.get(k).name or k), fields)), primaryKey
@@ -139,7 +139,7 @@ class ModelMetaclass(type):
 
 
 
-class Model(dict, metclass=ModelMetaclass):
+class Model(dict, metaclass=ModelMetaclass):
     def __init__(self, **kw):
         super(Model, self).__init__(**kw)
 
@@ -178,7 +178,7 @@ class Model(dict, metclass=ModelMetaclass):
         orderBy = kw.get('orderBy', None)
         if orderBy:
             sql.append('order by')
-            sql.append(orderby)
+            sql.append(orderBy)
 
         limit = kw.get('limit', None)
         if limit is not None:
