@@ -118,9 +118,6 @@ def datetime_filter(t):
     dt = datetime.fromtimestamp(t)
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 
-def index(request):
-    return web.Response(body=b'<h1>Welcome</h1>', content_type='text/html')
-
 async def init(loop):
     await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='www', password='www', db='pyblog')
     app = web.Application(loop=loop, middlewares=[
