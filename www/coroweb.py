@@ -69,6 +69,8 @@ def add_static(app):
     app.router.add_static('/static/', path)
     logging.info('add static {} => {}'.format('/static/', path))
 
+# 运用inspect模块，创建几个函数用以获取URL处理函数与request参数之间的关系
+# 收集没有默认值的命名关键字参数
 def get_required_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
@@ -78,6 +80,7 @@ def get_required_kw_args(fn):
             args.append(name)
     return tuple(args)
 
+# 获取命名关键字参数
 def get_named_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
@@ -86,18 +89,21 @@ def get_named_kw_args(fn):
             args.append(name)
     return tuple(args)
 
+# 判断有没有命名关键字参数
 def has_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
             return True
 
+# 判断有没有关键字参数
 def has_var_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
 
+# 判断是否含有名叫'request'参数，且该参数是否为最后一个参数
 def has_request_arg(fn):
     sig = inspect.signature(fn)
     params = sig.parameters
@@ -115,9 +121,9 @@ def has_request_arg(fn):
 
 class RequestHandler(object):
     '''
-    # RequestHandler目的就是从URL函数中分析其需要接收的参数，从request中获取必要的参数，
-    # URL函数不一定是一个coroutine，因此我们用RequestHandler()来封装一个URL处理函数。
-    # 调用URL函数，然后把结果转换为web.Response对象，这样，就完全符合aiohttp框架的要求
+    RequestHandler目的就是从URL函数中分析其需要接收的参数，从request中获取必要的参数，
+    URL函数不一定是一个coroutine，因此我们用RequestHandler()来封装一个URL处理函数。
+    调用URL函数，然后把结果转换为web.Response对象，这样，就完全符合aiohttp框架的要求
     '''
     def __init__(self, app, fn):
          self._app = app
@@ -134,7 +140,7 @@ class RequestHandler(object):
         if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
             if request.method == 'POST':
                 if not request.content_type:
-                    return web.HTTPBadRequest('Missing Content-Type.')
+                    return web.HTTPBadRequest(text='Missing Content-Type.')
                 ct = request.content_type.lower()
                 if ct.startswith('application/json'):
                     params = await request.json()
@@ -156,12 +162,13 @@ class RequestHandler(object):
         if kw is None:
             kw = dict(**request.match_info)
         else:
+            # 当函数参数没有关键字参数时，移去request除命名关键字参数所有的参数信息
             if not self._has_var_kw_arg and self._named_kw_args:
                 copy = dict()
                 for name in self._named_kw_args:
                     if name in kw:
                         copy[name] = kw[name]
-                kw = copyright
+                kw = copy
             for k, v in request.match_info.items():
                 if k in kw:
                     logging.warning('Duplicate arg name in named arg and kw args: {}'.format(k))
