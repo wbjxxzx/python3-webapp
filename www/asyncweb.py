@@ -37,7 +37,7 @@ class RequestHandler(object):
     async def __call__(self, request):
         # 获取URL处理函数的参数
         url_args = inspect.signature(self._func).parameters
-        logging.info('{} args: {}'.format(self._func.__name__, func_args))
+        logging.info('{} args: {}'.format(self._func.__name__, url_args))
         
         # 获取从GET或POST传入的参数，如果URL处理函数有这参数名，就加入dict
         kw = {arg: value for arg, value in request.__data__.items() if arg in url_args}
