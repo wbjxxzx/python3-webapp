@@ -2,10 +2,15 @@
 #-*- coding:utf-8 -*-
 __author__ = 'Ming'
 
-from coroweb import get
+from asyncweb import get
+from models import User
 @get('/')
 def index(request):
-    return '<h1>Welcome</h1>'
+    users = yield from User.findAll()
+    return {
+        '__template__': 'test.html',
+        'users': users
+    }
 
 @get('/hello')
 def hello(request):
