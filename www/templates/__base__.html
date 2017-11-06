@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        {% block meta %} {% endblock %}
+        <title>
+            {% block title %} ? {% endblock %} pyblog
+        </title>
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+        <script src="/static/js/jquery-3.2.1.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        {% block header %} {% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> -->
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#navbar-menu1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Blog</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbar-menu1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">iOS<span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">GIT</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Shell
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Perl</a></li>
+                                <li><a href="#">Python</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">Javascript</a></li>
+                            </ul>
+                        </li>
+                        </ul>
+                        <form class="navbar-form navbar-left">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search">
+                            </div>
+                            <button ttype="submit" class="btn btn-default">Submit</button>
+                        </form>
+
+                        <div class="nav navbar-nav navbar-right">
+                        <ul>
+                            <li><a href="/logout">
+                                <button type="button" class="btn btn-default btn-lg">
+                                    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> logout
+                                </button>
+                                </a>
+                            </li>
+                        </ul>
+                        </div>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container">
+        <nav>
+            <ul class="nav nav-pills">
+                <li role="presentation" class="active"><a href="#">Home</a></li>
+                <li role="presentation"><a href="#">Profile</a></li>
+                <li role="presentation"><a href="#">Message</a></li>
+            </ul>
+        </nav>
+
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" 
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            dropdown
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMunu1">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+            </ul>
+        </div>
+
+        <div class="row">
+            <div class="">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+
+        <div class="row" style="">
+            <div class="">
+                <div class="">
+                    <p>
+                        <a target="_blank" href="#" class=""></a>
+                        <a target="_blank" href="#" class=""></a>
+                        <a target="_blank" href="#" class=""></a>
+                        <a target="_blank" href="#" class=""></a>
+                    </p>
+                    <p>Powered by <a href="#">pyblog</a>. Copyright &copy; 2017. [<a href="/manage/" target="_blank">Manage</a></p>
+                    <p><a href="http://www.github.com/" target="_blank">www.github.com</a>. All rights reserved.</p>
+                    <a target="_blank" href="#"><i class="uk-icon-html5" style="font-size:64px; color #444;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
