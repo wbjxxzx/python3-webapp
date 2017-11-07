@@ -23,7 +23,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Blog</a>
+                    <a class="navbar-brand" href="#"><i class="glyphicon glyphicon-bold"></i></a>
                 </div>
 
                 <div class="collapse navbar-collapse" id="navbar-menu1">
@@ -51,7 +51,7 @@
                         </form>
 
                         <div class="nav navbar-nav navbar-right">
-                        <ul>
+                        <ul class="list-unstyled">
                             <li><a href="/logout">
                                 <button type="button" class="btn btn-default btn-lg">
                                     <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> logout
@@ -67,51 +67,25 @@
         </nav>
         
         <div class="container">
-        <nav>
-            <ul class="nav nav-pills">
-                <li role="presentation" class="active"><a href="#">Home</a></li>
-                <li role="presentation"><a href="#">Profile</a></li>
-                <li role="presentation"><a href="#">Message</a></li>
-            </ul>
-        </nav>
 
-        <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" 
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            dropdown
-            <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMunu1">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
-            </ul>
+                    {% block content %}
+                    {% endblock %}
+
         </div>
-
-        <div class="row">
-            <div class="">
-                {% block content %}
-                {% endblock %}
+            <footer class="">
+                <p>
+                    <a target="_blank" href="#" class=""></a>
+                    <a target="_blank" href="#" class=""></a>
+                    <a target="_blank" href="#" class=""></a>
+                    <a target="_blank" href="#" class=""></a>
+                </p>
             </div>
-        </div>
-
-        <div class="row" style="">
             <div class="">
-                <div class="">
-                    <p>
-                        <a target="_blank" href="#" class=""></a>
-                        <a target="_blank" href="#" class=""></a>
-                        <a target="_blank" href="#" class=""></a>
-                        <a target="_blank" href="#" class=""></a>
-                    </p>
                     <p>Powered by <a href="#">pyblog</a>. Copyright &copy; 2017. [<a href="/manage/" target="_blank">Manage</a></p>
                     <p><a href="http://www.github.com/" target="_blank">www.github.com</a>. All rights reserved.</p>
                     <a target="_blank" href="#"><i class="uk-icon-html5" style="font-size:64px; color #444;"></i></a>
-                </div>
             </div>
-        </div>
-    </div>
+        </footer>
+        
     </body>
 </html>
