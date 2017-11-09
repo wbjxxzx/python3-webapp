@@ -9,7 +9,8 @@
         <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
         <script src="/static/js/jquery-3.2.1.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
-        {% block header %} {% endblock %}
+        <script src="/static/js/vue.min.js"></script>
+        {% block beforehead %} {% endblock %}
     </head>
     <body>
         <nav class="navbar navbar-default">
@@ -47,7 +48,7 @@
                             <div class="form-group">
                                 <input type="text" class="form-control" placeholder="Search">
                             </div>
-                            <button ttype="submit" class="btn btn-default">Submit</button>
+                            <button type="submit" class="btn btn-default">Submit</button>
                         </form>
 
                         <div class="nav navbar-nav navbar-right">
@@ -66,12 +67,12 @@
                                 </ul>
                                 {% else %}
                                 <div class="nav navbar-nav btn-group" role="group" aria-label="...">
-                                    <button type="button" class="btn btn-default">
-                                        <a href="/signin"><i class="glyphicon glyphicon-log-in"></i> 登陆</a>
-                                    </button>
-                                    <button type="button" class="btn btn-default">
-                                        <a href="/register"><i class="glyphicon glyphicon-plus"></i> 注册</a>
-                                    </button>
+                                    <!-- <button type="button" > -->
+                                        <a href="/signin" class="btn btn-success"><i class="glyphicon glyphicon-log-in"></i> 登陆</a>
+                                    <!-- </button> -->
+                                    <!-- <button type="button" > -->
+                                        <a href="/register" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> 注册</a>
+                                    <!-- </button> -->
                                 </div>
                                 {% endif %}
 
@@ -88,18 +89,19 @@
                     {% endblock %}
 
         </div>
-            <footer class="text-center">
-                <p>
-                    <a target="_blank" href="#" class=""></a>
-                    <a target="_blank" href="#" class=""></a>
-                    <a target="_blank" href="#" class=""></a>
-                    <a target="_blank" href="#" class=""></a>
-                </p>
-            </div>
+        <hr />
+        <footer class="text-center">
+            <p>
+                <a target="_blank" href="#" class=""></a>
+                <a target="_blank" href="#" class=""></a>
+                <a target="_blank" href="#" class=""></a>
+                <a target="_blank" href="#" class=""></a>
+            </p>
+
             <div class="">
-                    <p>Powered by <a href="#">pyblog</a>. Copyright &copy; 2017. [<a href="/manage/" target="_blank">Manage</a></p>
-                    <p><a href="http://www.github.com/" target="_blank">www.github.com</a>. All rights reserved.</p>
-                    <a target="_blank" href="#"><i class="uk-icon-html5" style="font-size:64px; color #444;"></i></a>
+                <p>Powered by <a href="#">pyblog</a>. Copyright &copy; 2017. [<a href="/manage/" target="_blank">Manage</a>]</p>
+                <p><a href="http://www.github.com/" target="_blank">www.github.com</a>. All rights reserved.</p>
+                <a target="_blank" href="#"><i class="uk-icon-html5" style="font-size:64px; color #444;"></i></a>
             </div>
         </footer>
         

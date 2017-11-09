@@ -15,7 +15,8 @@ import orm
 # from coroweb import add_routes, add_static
 from asyncweb import add_routes, add_static
 from urllib import parse
-from conf import configs
+from conf.config import configs
+from handlers import cookie2user, COOKIE_NAME
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
@@ -60,9 +61,24 @@ async def data_factory(app, handler):
         elif request.method == 'GET':
             qs = request.query_string
             request.__data__ = {k: v[0] for k, v in parse.parse_qs(qs, True).items()}
-            logging.info('request query: {}'.format(request.__data__))
+            logging.info('request query: {}'.format(str(request.__data__)))
         return (await handler(request))
     return parse_data
+
+async def auth_factory(app, handler):
+    async def auth(request):
+        logging.info('check user: {} {}'.format(request.method, request.path))
+        request.__user__ = None
+        cookie_str = request.cookies.get(COOKIE_NAME)
+        if cookie_str:
+            user = await cookie2user(cookie_str)
+            if user:
+                logging.info('set current user: {}'.format(user.email))
+                request.__user__ = user 
+        if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
+            return web.HTTPFound('/signin')
+        return await handler(request)
+    return auth 
 
 # 响应处理
 # 总结下来一个请求在服务端收到后的方法调用顺序是:
@@ -98,6 +114,7 @@ async def response_factory(app, handler):
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
             else:
+                r['__user__'] = request.__user__
                 resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp 
@@ -128,7 +145,7 @@ def datetime_filter(t):
 
 async def init(loop):
     # await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='www', password='www', db='pyblog')
-    await orm.create_pool(loop=loop, **configs.configs.db)
+    await orm.create_pool(loop=loop, **configs.db)
     app = web.Application(loop=loop, middlewares=[
         logger_factory, data_factory, response_factory, 
     ])
